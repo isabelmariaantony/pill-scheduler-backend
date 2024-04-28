@@ -62,8 +62,6 @@ app.get('/pills', (req, res) => {
 });
 
 app.get('/pillsByTimeRange', (req, res) => {
-    
-    
     const date = getCurrentDate();
     const timeRange = req.query.timeRange || getCurrentTimeRange();
 
@@ -105,6 +103,22 @@ app.get('/markServed', (req, res) => {
 
     servedTimeRanges[date][timeRange] = true;
     res.json({ message: `Marked ${timeRange} of ${date} as served.` });
+});
+
+app.get('/unMarkServed', (req, res) => {
+    const date = getCurrentDate();
+    const timeRange = req.query.timeRange || getCurrentTimeRange();
+
+    if (!timeRangeMap[timeRange]) {
+        return res.status(400).json({ error: "Invalid time range specified" });
+    }
+
+    if (servedTimeRanges[date] && servedTimeRanges[date][timeRange]) {
+        delete servedTimeRanges[date][timeRange];
+        res.json({ message: `Mark for ${timeRange} on ${date} has been removed.` });
+    } else {
+        res.status(404).json({ error: `No mark found for ${timeRange} on ${date}.` });
+    }
 });
 
 app.listen(PORT, () => {
