@@ -7,6 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 let pills = {};
+let servedTimeRanges = {};
 
 const timeRangeMap = {
     'morning': '6AM-10AM',
@@ -18,11 +19,15 @@ const timeRangeMap = {
 
 function getCurrentTimeRange() {
     const hour = new Date().getHours();
-    if (hour >= 6 && hour < 10) return 'morning';   // From 6 AM to 10 AM
-    if (hour >= 10 && hour < 12) return 'noon';     // From 10 AM to 12 PM
-    if (hour >= 12 && hour < 16) return 'afternoon';// From 12 PM to 4 PM
-    if (hour >= 16 && hour < 20) return 'evening';  // From 4 PM to 8 PM
-    return 'night';                                 // From 8 PM to 6 AM
+    if (hour >= 6 && hour < 10) return 'morning';
+    if (hour >= 10 && hour < 12) return 'noon';
+    if (hour >= 12 && hour < 16) return 'afternoon';
+    if (hour >= 16 && hour < 20) return 'evening';
+    return 'night';
+}
+
+function getCurrentDate() {
+    return new Date().toISOString().split('T')[0];
 }
 
 app.post('/addPill', (req, res) => {
@@ -57,10 +62,13 @@ app.get('/pills', (req, res) => {
 });
 
 app.get('/pillsByTimeRange', (req, res) => {
-    let { timeRange } = req.query;
-    if (!timeRange) {
-        timeRange = getCurrentTimeRange();
+    const date = getCurrentDate();
+    const timeRange = req.query.timeRange || getCurrentTimeRange();
+
+    if (servedTimeRanges[date] && servedTimeRanges[date][timeRange]) {
+        return res.status(404).json({ error: "This time range has already been served today." });
     }
+
     if (!timeRangeMap[timeRange]) {
         return res.status(400).json({ error: "Invalid time range specified" });
     }
@@ -79,6 +87,22 @@ app.get('/pillsByTimeRange', (req, res) => {
     }, []);
 
     res.json(result);
+});
+
+app.get('/markServed', (req, res) => {
+    const date = getCurrentDate();
+    const timeRange = req.query.timeRange || getCurrentTimeRange();
+
+    if (!timeRangeMap[timeRange]) {
+        return res.status(400).json({ error: "Invalid time range specified" });
+    }
+
+    if (!servedTimeRanges[date]) {
+        servedTimeRanges[date] = {};
+    }
+
+    servedTimeRanges[date][timeRange] = true;
+    res.json({ message: `Marked ${timeRange} of ${date} as served.` });
 });
 
 app.listen(PORT, () => {
