@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const os = require('os');
 const app = express();
 const PORT = 4000;
 
@@ -119,6 +120,28 @@ app.get('/unMarkServed', (req, res) => {
     } else {
         res.status(404).json({ error: `No mark found for ${timeRange} on ${date}.` });
     }
+});
+
+app.get('/getServerInfo', (req, res) => {
+    const networkInterfaces = os.networkInterfaces();
+    const addresses = [];
+
+    for (let interfaceKey in networkInterfaces) {
+        const interfaces = networkInterfaces[interfaceKey];
+        for (let interfaceInfo of interfaces) {
+            if (!interfaceInfo.internal && interfaceInfo.family === 'IPv4') {
+                addresses.push({
+                    interface: interfaceKey,
+                    address: interfaceInfo.address
+                });
+            }
+        }
+    }
+
+    res.json({
+        addresses: addresses,
+        port: PORT
+    });
 });
 
 app.listen(PORT, () => {
