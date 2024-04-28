@@ -6,9 +6,17 @@ const PORT = 4000;
 app.use(cors());
 app.use(express.json());
 
-let pills = {}; // Store pills by box number with details including name and schedule
+let pills = {}; // This will store pills by their box numbers, each with a name, schedule, and box number.
 
-// Add a pill
+const timeRangeMap = {
+    'morning': '5AM-10AM',
+    'noon': '10AM-12PM',
+    'afternoon': '12PM-4PM',
+    'evening': '4PM-8PM',
+    'night': '8PM-5AM'
+};
+
+// Add a new pill
 app.post('/addPill', (req, res) => {
     const { name, boxNumber } = req.body;
     if (pills[boxNumber]) {
@@ -28,11 +36,6 @@ app.delete('/deletePill/:boxNumber', (req, res) => {
     res.status(204).send();
 });
 
-// Get all pills
-app.get('/pills', (req, res) => {
-    res.status(200).json(Object.values(pills));
-});
-
 // Update pill schedule
 app.post('/updateSchedule', (req, res) => {
     const { boxNumber, schedule } = req.body;
@@ -41,6 +44,34 @@ app.post('/updateSchedule', (req, res) => {
     }
     pills[boxNumber].schedule = schedule;
     res.status(200).json({ message: "Schedule updated successfully", pill: pills[boxNumber] });
+});
+
+// Get all pills
+app.get('/pills', (req, res) => {
+    res.status(200).json(Object.values(pills));
+});
+
+// Get pills by time range
+app.get('/pillsByTimeRange', (req, res) => {
+    const { timeRange } = req.query;  // e.g., timeRange='morning'
+    if (!timeRangeMap[timeRange]) {
+        return res.status(400).json({ error: "Invalid time range specified" });
+    }
+
+    const mappedTimeRange = timeRangeMap[timeRange];
+    const result = Object.values(pills).reduce((acc, pill) => {
+        const scheduleEntry = pill.schedule.find(entry => entry.timeRange === mappedTimeRange);
+        if (scheduleEntry) {
+            acc.push({
+                name: pill.name,
+                boxNumber: pill.boxNumber,
+                count: scheduleEntry.count
+            });
+        }
+        return acc;
+    }, []);
+
+    res.json(result);
 });
 
 app.listen(PORT, () => {
