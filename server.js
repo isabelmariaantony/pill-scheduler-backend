@@ -10,16 +10,16 @@ let pills = {};
 let servedTimeRanges = {};
 
 const timeRangeMap = {
-    'morning': '6AM-10AM',
+    'morning': '5AM-10AM',
     'noon': '10AM-12PM',
     'afternoon': '12PM-4PM',
     'evening': '4PM-8PM',
-    'night': '8PM-6AM'
+    'night': '8PM-5AM'
 };
 
 function getCurrentTimeRange() {
     const hour = new Date().getHours();
-    if (hour >= 6 && hour < 10) return 'morning';
+    if (hour >= 5 && hour < 10) return 'morning';
     if (hour >= 10 && hour < 12) return 'noon';
     if (hour >= 12 && hour < 16) return 'afternoon';
     if (hour >= 16 && hour < 20) return 'evening';
@@ -62,6 +62,8 @@ app.get('/pills', (req, res) => {
 });
 
 app.get('/pillsByTimeRange', (req, res) => {
+    
+    
     const date = getCurrentDate();
     const timeRange = req.query.timeRange || getCurrentTimeRange();
 
