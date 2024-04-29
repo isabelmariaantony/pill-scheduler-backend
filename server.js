@@ -11,11 +11,11 @@ let pills = {};
 let servedTimeRanges = {};
 
 const timeRangeMap = {
-    'morning': '5AM-10AM',
-    'noon': '10AM-12PM',
-    'afternoon': '12PM-4PM',
-    'evening': '4PM-8PM',
-    'night': '8PM-5AM'
+    'morning': 'morning',
+    'noon': 'noon',
+    'afternoon': 'afternoon',
+    'evening': 'evening',
+    'night': 'night'
 };
 
 function getCurrentTimeRange() {
@@ -54,7 +54,14 @@ app.post('/updateSchedule', (req, res) => {
     if (!pills[boxNumber]) {
         return res.status(404).json({ error: "Pill not found for this box number" });
     }
-    pills[boxNumber].schedule = schedule;
+
+    // Convert alias to actual time ranges for internal storage
+    const updatedSchedule = schedule.map(item => ({
+        timeRange: timeRangeMap[item.timeRange], // Translate alias to time range
+        count: item.count
+    }));
+
+    pills[boxNumber].schedule = updatedSchedule;
     res.status(200).json({ message: "Schedule updated successfully", pill: pills[boxNumber] });
 });
 
