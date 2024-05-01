@@ -36,7 +36,7 @@ npm -v
 
 ## Set Up Your Node.js Application
 
-cd pill-scheduler-frontend
+cd pill-scheduler-backend
 
 Install Dependencies: Run the following command in the application directory:
 npm install
