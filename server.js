@@ -29,10 +29,9 @@ function getCurrentHourInPST() {
     return parseInt(hourString, 10); // Converts the hour string to an integer
 }
 
-console.log(getCurrentHourInPST()); // Outputs the current hour in PST or PDT as an integer
 
 function getCurrentTimeRange() {
-    const hour = getCurrentHourInPST;
+    const hour = getCurrentHourInPST();
     if (hour >= 5 && hour < 10) return 'morning';
     if (hour >= 10 && hour < 12) return 'noon';
     if (hour >= 12 && hour < 16) return 'afternoon';
