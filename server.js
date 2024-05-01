@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const os = require('os');
 const app = express();
-const PORT = process.env.PORT || 3030;
+const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
@@ -87,6 +87,7 @@ app.get('/pillsByTimeRange', (req, res) => {
         if (scheduleEntry) {
             acc.push({
                 name: pill.name,
+                timeRange: timeRange,
                 boxNumber: pill.boxNumber,
                 count: scheduleEntry.count
             });
@@ -147,7 +148,8 @@ app.get('/getServerInfo', (req, res) => {
 
     res.json({
         addresses: addresses,
-        port: PORT
+        port: PORT,
+        currentHour:  new Date().getHours(),
     });
 });
 
