@@ -18,8 +18,21 @@ const timeRangeMap = {
     'night': 'night'
 };
 
+function getCurrentHourInPST() {
+    const date = new Date();
+    const options = {
+        timeZone: 'America/Los_Angeles',
+        hour: '2-digit',
+        hour12: false // Ensures the output is in 24-hour format
+    };
+    const hourString = date.toLocaleTimeString('en-US', options).split(':')[0];
+    return parseInt(hourString, 10); // Converts the hour string to an integer
+}
+
+console.log(getCurrentHourInPST()); // Outputs the current hour in PST or PDT as an integer
+
 function getCurrentTimeRange() {
-    const hour = new Date().getHours();
+    const hour = getCurrentHourInPST;
     if (hour >= 5 && hour < 10) return 'morning';
     if (hour >= 10 && hour < 12) return 'noon';
     if (hour >= 12 && hour < 16) return 'afternoon';
@@ -149,7 +162,7 @@ app.get('/getServerInfo', (req, res) => {
     res.json({
         addresses: addresses,
         port: PORT,
-        currentHour:  new Date().getHours(),
+        currentHour:  getCurrentHourInPST(),
     });
 });
 
