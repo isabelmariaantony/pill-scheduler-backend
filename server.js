@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const os = require('os');
+const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -17,6 +18,28 @@ const timeRangeMap = {
     'evening': 'evening',
     'night': 'night'
 };
+
+
+function invokeURLs() {
+    const urls = [
+        'https://pill-scheduler-backend.onrender.com/pillsByTimeRange',
+        'https://pill-scheduler-frontend.onrender.com'
+    ];
+
+    urls.forEach(url => {
+        axios.get(url)
+            .then(response => {
+                console.log(`Response from ${url}:`, response.status);
+            })
+            .catch(error => {
+                console.error(`Error fetching ${url}:`, error.message);
+            });
+    });
+}
+
+// Schedule to run every 10 minutes
+setInterval(invokeURLs, 600000); // 600,000 milliseconds = 10 minutes
+
 
 function getCurrentHourInPST() {
     const date = new Date();
