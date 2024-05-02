@@ -185,6 +185,7 @@ app.get('/getServerInfo', (req, res) => {
         addresses: addresses,
         port: PORT,
         currentHour:  getCurrentHourInPST(),
+        timeRange: getCurrentTimeRange(),
     });
 });
 
